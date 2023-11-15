@@ -1,7 +1,28 @@
-html {
-  color: #222;
-  font-size: 1em;
-  line-height: 1.4;
+@font-face{
+  font-family: "Pixel";
+  src: url("fonts/pixel.ttf");
+}
+
+@font-face{
+  font-family: "Zopes";
+  src: url("fonts/zopes.ttf")format("truetype");
+}
+
+html, body{
   background: black;
   color: white;
+  font-family: Pixel;
+  font-size: 20px;
+}
+#game {
+  margin: 10px auto;
+  padding: 0;
+  width: 800px;
+  height: 600px;
+}
+
+.sidebar-nav {
+  margin-top: 20px;
+  padding: 0;
+  list-style: none;
 }

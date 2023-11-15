@@ -1,0 +1,21 @@
+{% extends "base_template.html" %}
+{% block title %}Leaderboards{% endblock %}
+
+{% block content %}
+    <h1>Leaderboards</h1>
+
+    {% if leaderboard_list %}
+    Nickname   Score
+    <ol>
+
+      {% for player in leaderboard_list %}
+      <li>
+          {{ player.nickname }}                         {{player.score}}
+      </li>
+      {% endfor %}
+
+    </ol>
+    {% else %}
+      <p>No data for now. Be the first!</p>
+    {% endif %}
+{% endblock %}

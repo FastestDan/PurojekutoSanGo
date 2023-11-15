@@ -17,15 +17,15 @@ const config = {
     default: 'arcade',
     arcade: {
       gravity: { y: 300 },
-      debug: true
+      debug: false
     },
     matter: {
       gravity: { y: 1 },
       enableSleep: false,
-      debug: true
+      debug: false
     }
   },
-  pixelArt: false,
+  pixelArt: true,
   render: {
     antialias: false,
   }
@@ -35,10 +35,9 @@ var score = 0;
 var scoreText;
 var game = new Phaser.Game(config);
 
+let minus;
+
 function preload() {
-  // Image layers from Tiled can't be exported to Phaser 3 (as yet)
-  // So we add the background image separately
-  // this.load.image('background', 'assets/images/background.png');
 
   this.load.image('sky1', 'static/assets/images/UpperSky.png')
   this.load.image('sky2', 'static/assets/images/MiddleSky.png')
@@ -64,6 +63,7 @@ function preload() {
 function create() {
   // Create a tile map, which is used to bring our level in Tiled
   // to our game world in Phaser
+  minus = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.MINUS);
   const map = this.make.tilemap({ key: 'map' });
   // // Add the tileset to the map so the images would load correctly in Phaser
   const tileset = map.addTilesetImage('GHZ_Tiles', 'tiles');
@@ -83,21 +83,13 @@ function create() {
   this.cliffs.setScale(2.5);
   this.waterfall.setScale(2.5);
   this.water.setScale(2.5);
-  // this.physics.enable(this.water, 'back');
-  // water.fixedToCamera = true;
-  // Add the platform layer as a static group, the player would be able
-  // to jump on platforms like world collisions but they shouldn't move
+
   const platdec = map.createStaticLayer('SurfDecor', tileset, 0, -1500);
   const platforms = map.createStaticLayer('Surface', tileset, 0, -1500);
 
   platforms.setScale(2.1);
   platdec.setScale(2.1);
 
-  // There are many ways to set collision between tiles and players
-  // As we want players to collide with all of the platforms, we tell Phaser to
-  // set collisions for every tile in our platform layer whose index isn't -1.
-  // Tiled indices can only be >= 0, therefore we are colliding with all of
-  // the platform layer
   platforms.setCollisionByExclusion(-1, true);
 
   // Add the player to the game world
@@ -161,11 +153,10 @@ function create() {
   this.waterfall.play('wfgo');
   this.water.play({key: 'wgo',repeat: -1});
 
-  scoreText = this.add.text(0, 10, 'Score: 0', { fontSize: '40px', fill: '#e1dc26' }).setScrollFactor(0);
+  scoreText = this.add.text(25, 30, '', { fontSize: '40px', fill: '#dedb1c', fontFamily: 'Zopes' }).setScrollFactor(0);
+  win = this.add.text(150, 150, 'Hooray!', { fontSize: '100px', fill: '#000000', fontFamily: 'Zopes' }).setScrollFactor(0);
+  win.visible = false;
 
-  // this.watf = this.add.group();
-  // this.watf.createMultiple({ key: 'waterfallgo', repeat: 1});
-  // this.watf.playAnimation('wfgo');
 
   // Enable user input via cursor keys
   this.cursors = this.input.keyboard.createCursorKeys();
@@ -195,7 +186,7 @@ function create() {
   // Add collision between the player and the spikes
   this.physics.add.overlap(this.player, this.rings, ringget, null, this);
 
-  this.cameras.main.setBounds(0, 0, 9600, 850);
+  this.cameras.main.setBounds(0, 0, 9600*2, 850);
 
   this.cameras.main.startFollow(this.player, true);
   this.cameras.main.setZoom(1);
@@ -205,7 +196,10 @@ function update() {
   // Control the player with left or right keys
   // const children = this.watf.getChildren();
   const cam = this.cameras.main;
-
+  scoreText.setText('SASISKA GET LAL');
+  scoreText.setText("SCORE: " + score);
+  win.setText('WHISKAS');
+  win.setText('Hooray!');
   if (this.moveCam)
   {
     if (this.cursors.left.isDown)
@@ -241,7 +235,23 @@ function update() {
       if (this.player.body.onFloor()) {
         this.player.play('walk', true);
       }
-    } else {
+    }else if (minus.isDown){
+      win.visible = true;
+      // $.ajax({
+      //   type: POST,
+      //   url: "game-end", // be mindful of url names
+      //   data: {
+      //     score
+      //   },
+      //   success: function(response) {
+      //
+      //     // unpack response:
+      //     status = response.status
+      //
+      //   }
+      // })
+    }
+    else {
       //   // If no keys are pressed, the player keeps still
       this.player.setVelocityX(0);
       // Only show the idle animation if the player is footed
@@ -269,19 +279,37 @@ function update() {
       // otherwise, make them face the other side
       this.player.setFlipX(true);
     }
-
   }
+
 }
 
-/**
- * playerHit resets the player's state when it dies from colliding with a spike
- * @param {*} player - player sprite
- * @param {*} spike - spike player collided with
- */
+// /**
+//  * playerHit resets the player's state when it dies from colliding with a spike
+//  * @param {*} player - player sprite
+//  * @param {*} spike - spike player collided with
+//  */
 function ringget(player, ring) {
   ring.disableBody(true, true);
 
   //  Add and update the score
   score += 10;
-  scoreText.setText('Score: ' + score);
+  // scoreText.setText('SCORE: ' + score);
 }
+
+// function datago(score) {
+// //   $ajax({
+// //     type: "GET",
+// //     url: '/my_def_in_view',
+// //     data: {
+// //       "score": score,
+// //     },
+// //     dataType: "json",
+// //     success: function (data) {
+// //       // any process in data
+// //       alert("successfull")
+// //     },
+// //     failure: function () {
+// //       alert("failure");
+// //     }
+// //   });
+// }
