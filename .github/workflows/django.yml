@@ -28,7 +28,3 @@ jobs:
     - name: Run Tests
       run: |
         python manage.py test
-    - name: Setup Java JDK
-      uses: actions/setup-java@v3.13.0
-    - name: Setup Node.js environment
-      uses: actions/setup-node@v4.0.0
